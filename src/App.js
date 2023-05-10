@@ -3,7 +3,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 //components
 import Register from "./component/form/register/Register";
 import Login from "./component/form/login/Login"
-
+import Main from "./component/main/Main";
 
 function App() {
   return (
@@ -12,8 +12,9 @@ function App() {
 
         <Routes>
           <Route path="/*" element={<Navigate to="/register" />} />
-          <Route exact path="/register" element={<Register />} />
-          <Route exact path="/login" element={<Login />} />
+          <Route  path="/register" element={<Register />} />
+          <Route  path="/login" element={<Login />} />
+          <Route  path="/main" element={<Main />} />
         </Routes>
 
       </div>

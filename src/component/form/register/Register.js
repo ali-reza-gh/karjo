@@ -15,7 +15,9 @@ const textInputClassName =
   "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
 
 const Register = () => {
-  const { register, handleSubmit, setFocus, formState: { errors }, } = useForm({ resolver: yupResolver(registerSchema), });
+  const { register, handleSubmit, setFocus, formState: { errors }, } = useForm({ resolver: yupResolver(registerSchema) });
+  
+  const navigate = useNavigate();
 
   const submitHandler = (data) => {
     console.log(data)
@@ -25,7 +27,7 @@ const Register = () => {
   useEffect(() => {
     setFocus("email")
   }, [setFocus]);
-  const navigate = useNavigate();
+
 
   return (
     <div className="md:w-[500px] shadow-sm shadow-white bg-white w-[320px] mx-auto px-7 py-4 rounded-xl">
