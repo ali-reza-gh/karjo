@@ -1,4 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
+
+// toastify
+import {
+  ToastContainer,
+  toast
+} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 //react-hook-form
 import { useForm } from "react-hook-form";
@@ -10,24 +17,61 @@ import { useNavigate } from 'react-router-dom';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { userSchema } from './LoginValidation';
 
+//GQL
+import { useMutation } from '@apollo/client';
+import { LOGIN_MUTATION } from '../../../gql/Mutations';
+
+
 const textInputClassName =
   "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
 
 const Login = () => {
-    const { register, handleSubmit, setFocus, formState: { errors } } = useForm({resolver: yupResolver(userSchema)  });
+  const { register, handleSubmit, setFocus, formState: { errors } } = useForm({ resolver: yupResolver(userSchema) });
 
-    useEffect(() => {
-        setFocus("username")
-    }, [setFocus])
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  useEffect(() => {
+    setFocus("email")
+  }, [setFocus])
 
-    const submitHandler = (data) => { console.log(data)
-      navigate("/main") 
-    };
+  const [login] = useMutation(LOGIN_MUTATION)
 
-    return (
-      <div className="md:w-[500px] shadow-sm shadow-white bg-white w-[320px] mx-auto px-7 py-4 rounded-xl">
+  const submitHandler = useCallback(
+    async (values) => {
+      try {
+        const datagql = await
+          login({
+            variables: { email: values.email, password: values.password }
+          })
+        const status = await datagql.data.login.status;
+
+        if(status)  {
+          localStorage.setItem("token", datagql.data.login.token);
+          localStorage.setItem("user", datagql.data.login.user.email);
+          navigate("/main");
+          console.log("login")
+        }
+          // : (
+            // toast(datagql.data.login.message));
+        // status ? (
+        //   localStorage.setItem("token", datagql.data.login.token),
+        //   localStorage.setItem("user", datagql.data.login.user.email),
+        //   navigate("/main"),
+        //   console.log("login")
+        // )
+        //   : (
+        //     toast(datagql.data.login.message));
+
+
+      }
+
+      catch (error) {
+        console.log("ERROR MESSAGE:", error);
+      }
+    }, [login, navigate]
+  );
+  return (
+    <div className="md:w-[500px] shadow-sm shadow-white bg-white w-[320px] mx-auto px-7 py-4 rounded-xl mt-16">
       <form onSubmit={handleSubmit(submitHandler)} className="w-full">
         <div className="mb-6">
           <label
@@ -70,7 +114,7 @@ const Login = () => {
             <></>
           )}
         </div>
-       
+
         <div className="flex justify-between mb-6">
           <div>
             <div className="flex">
@@ -99,9 +143,10 @@ const Login = () => {
         > Submit
         </button>
       </form>
+      <ToastContainer />
     </div>
- 
-    );
+
+  );
 
 };
 

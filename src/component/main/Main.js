@@ -1,13 +1,13 @@
-import { useState, useCallback, } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 //react-router-dom
-import { Route, Routes, useLocation} from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 //Components
 import Home from './Home/Home';
 import Jobs from './Jobs/Jobs';
 
 
-
+//Polaris
 import {
   Frame,
   Navigation,
@@ -15,7 +15,6 @@ import {
   TopBar,
   Layout
 } from '@shopify/polaris';
-
 import {
   ArrowLeftMinor,
   HomeMajor,
@@ -24,23 +23,48 @@ import {
 
 
 export default function Main() {
+  const navigate = useNavigate()
   const location = useLocation()
+
+  const token = localStorage.getItem("token")
+
+  useEffect(() => {
+
+    if (!token) { navigate("/login") }
+    console.log("mounted");
+    console.log(token);
+  }, [])
+
+  const userEmail = localStorage.getItem("user");
+  const userSplit = userEmail.split("@");
+  const userName = userSplit[0];
+  const userInitials = userEmail.slice(0, 1).toUpperCase();
+
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const toggleIsUserMenuOpen = useCallback(
     () => setIsUserMenuOpen((isUserMenuOpen) => !isUserMenuOpen),
     [],
   );
+
+
+  const logouteHandler = () => {
+    localStorage.clear("token", "user")
+    navigate("/login", { replace: true })
+  };
+
   const userMenuMarkup = (
     <TopBar.UserMenu
       actions={[
         {
-          items: [{ content: 'Logout', icon: ArrowLeftMinor }],
+          items: [{ content: 'Logout', icon: ArrowLeftMinor, onAction: logouteHandler }],
         },
       ]}
-      name="Alireza"
-      initials="A"
+      name={userName}
+      detail={userEmail}
+      initials={userInitials}
       open={isUserMenuOpen}
       onToggle={toggleIsUserMenuOpen}
+      activatorContent={logouteHandler}
     />
   );
   const topBarMarkup = (
@@ -70,12 +94,13 @@ export default function Main() {
     <Frame topBar={topBarMarkup} navigation={navbar}>
       <Layout>
         <Page fullWidth divider>
-        <Routes >
-            <Route path='/home' element={<Home />}/>
-            <Route path='/jobs/*' element={<Jobs />}/>
-        </Routes>
+          <Routes >
+            <Route path='/home' element={<Home />} />
+            <Route path='/jobs/*' element={<Jobs />} />
+          </Routes>
         </Page>
-        </Layout>
-      </Frame>
+      </Layout>
+    </Frame>
+
   );
 };

@@ -6,6 +6,7 @@ import { AlphaFiltersJobList } from "./jobscomponents/IndexJob";
 
 const JobList = () => {
   return (
+    <div className="min-w-[700px]">
     <Page
       title="Jobs:"
       primaryAction={
@@ -26,6 +27,7 @@ const JobList = () => {
         <Pagination />
       </div>
     </Page>
+    </div>
   );
 };
 export default JobList;

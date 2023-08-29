@@ -24,7 +24,7 @@ export function AlphaFiltersJobList() {
   ]);
   const filters = [ ];
   return (
-    <div style={{height: '568px'}}>
+    <div style={{height: '568px'}}className="min-w-[600px] mt-4">
       <LegacyCard>
         <ResourceList
           resourceName={{singular: 'customer', plural: 'customers'}}

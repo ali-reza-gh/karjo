@@ -1,4 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
+
+// toastify
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 //React-Hook-Form
 import { useForm } from "react-hook-form";
@@ -10,27 +15,45 @@ import { Link, useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerSchema } from "./registerValidation";
 
+//gql
+import { useMutation } from "@apollo/client";
+import { CREATE_USER } from '../../../gql/Mutations';
+
 
 const textInputClassName =
   "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
 
 const Register = () => {
   const { register, handleSubmit, setFocus, formState: { errors }, } = useForm({ resolver: yupResolver(registerSchema) });
-  
+
+  const [createUser] = useMutation(CREATE_USER);
+
   const navigate = useNavigate();
 
-  const submitHandler = (data) => {
-    console.log(data)
-    navigate("/login")
-  };
+  const submitHandler = useCallback(async (data, toastMarkup) => {
+    try {
+      const register = await createUser({
+        variables: { email: data.email, password: data.password }
+      })
+      const isRegister = register.data.createUser.status;
+
+      if (isRegister) {
+        navigate("/login")
+        console.log("Register Successfully");
+      } else { toast(register.data.createUser.message); }
+
+
+    } catch (error) { console.log("ERROR:", error.message); }
+
+  }, [createUser, navigate])
+
 
   useEffect(() => {
     setFocus("email")
   }, [setFocus]);
 
-
   return (
-    <div className="md:w-[500px] shadow-sm shadow-white bg-white w-[320px] mx-auto px-7 py-4 rounded-xl">
+    <div className="md:w-[500px] shadow-sm shadow-white bg-white w-[320px] mx-auto px-7 py-4 rounded-xl mt-20">
       <form onSubmit={handleSubmit(submitHandler)} className="w-full">
         <div className="mb-6">
           <label
@@ -48,7 +71,7 @@ const Register = () => {
             placeholder="test@test.com"
           />
           {errors.email ? (
-            <span className="text-red-900">{errors.email.message}</span>
+            <span className="text-red-600">{errors.email.message}</span>
           ) : (
             <></>
           )}
@@ -68,7 +91,7 @@ const Register = () => {
             className={textInputClassName}
           />
           {errors.password ? (
-            <span className="text-red-900">{errors.password.message}</span>
+            <span className="text-red-600">{errors.password.message}</span>
           ) : (
             <></>
           )}
@@ -88,7 +111,7 @@ const Register = () => {
             className={textInputClassName}
           />
           {errors.confirmPassword ? (
-            <span className="text-red-900">
+            <span className="text-red-600">
               {errors.confirmPassword.message}
             </span>
           ) : (
@@ -114,7 +137,7 @@ const Register = () => {
             <option value="Rather not say">Rather not say</option>
           </select>{" "}
           {errors.Type ? (
-            <span className="text-red-900">{errors.Type.message}</span>
+            <span className="text-red-600">{errors.Type.message}</span>
           ) : (
             <></>
           )}
@@ -140,7 +163,6 @@ const Register = () => {
               </label>
             </div>
           </div>
-
           <div>
             <div>
               <label
@@ -162,27 +184,29 @@ const Register = () => {
               </label>
             </div>
             {errors.toggle ? (
-              <span className="text-red-900">{errors.toggle.message}</span>
+              <span className="text-red-600">{errors.toggle.message}</span>
             ) : (
               <></>
             )}
           </div>
         </div>
-        <button
-          type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        > Submit
-        </button>
-        <Link to="/login">
+        <div className='md:ml-3' >
           <button
-          type="submit"
-          className="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        > Login
-        </button>
-        </Link>
+            type="submit"
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          > Submit
+          </button>
+          <Link to="/login">
+            <button
+              type="submit"
+              className="sm:ml-24  md:ml-64 text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            > Login
+            </button>
+          </Link>
+        </div>
       </form>
+      <ToastContainer />
     </div>
   );
 };
-
 export default Register;
