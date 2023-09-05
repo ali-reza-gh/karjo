@@ -15,12 +15,8 @@ import enTranslations from '@shopify/polaris/locales/en.json';
 import { AppProvider } from "@shopify/polaris";
 
 //GQL
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
-
-const client =new ApolloClient({
-  uri: "http://localhost:4000/graphql",
-  cache: new InMemoryCache(),
-});
+import { ApolloProvider } from '@apollo/client';
+import {client} from "./gql/Client"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

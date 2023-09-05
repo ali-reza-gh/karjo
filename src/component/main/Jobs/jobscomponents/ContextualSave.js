@@ -25,9 +25,11 @@ export function ContextualSave({ title, description, city, skills,message }) {
             })
             if(jobGql.data.createJob.status){
               navigate("/jobs")
+              window.location.reload()
             }
             console.log("jobgql is:", jobGql);
           }
+          
 
 
         }}

@@ -4,11 +4,48 @@ import {
   AlphaFilters,
   Avatar,
   Text,
+  Button,
+  Pagination
 } from '@shopify/polaris';
-import {useState, useCallback} from 'react';
+import { useState, useCallback } from 'react';
+//GQL
+import { JOBS_LIST } from "../../../../gql/Query";
+import { DELETE_JOB } from '../../../../gql/Mutations';
+import { useMutation, useQuery } from '@apollo/client';
+
+
 
 export function AlphaFiltersJobList() {
   const [queryValue, setQueryValue] = useState(undefined);
+  const [deleteJob] = useMutation(DELETE_JOB)
+  const [sortValue, setSortValue] = useState("DESC");
+  const [pageValue, setPageValue] = useState(1);
+  const { loading, data } = useQuery(JOBS_LIST, {
+    variables: {
+      page: pageValue,
+      pageSize: 2,
+      sort: sortValue,
+    }
+  });
+
+
+
+  const onNextHandler = () => {
+    setPageValue((prev) => prev + 1)
+  }
+  const onPreviousHandler = () => {
+    setPageValue((prev) => prev - 1)
+  }
+
+  // console.log("DATA IS:", data);
+
+
+
+  const deleteHandler = useCallback(async () => {
+    const DELETGQL = await deleteJob({ variable: { id: null } })
+  }, [deleteJob])
+
+
   const handleFiltersQueryChange = useCallback(
     (value) => setQueryValue(value),
     [],
@@ -22,12 +59,26 @@ export function AlphaFiltersJobList() {
   }, [
     handleQueryValueRemove,
   ]);
-  const filters = [ ];
+  const filters = [];
+  const totalPage = data ? data.jobs.totalPage : 0;
+  if (loading) { return (<h2>loading ...</h2>) }
+
+  const namei1 = data.jobs.jobs[1].title
+  const namei0 = data.jobs.jobs[0].title
+  const idi1 = data.jobs.jobs[1].id
+  const idi0 = data.jobs.jobs[0].id
+  const cityi1 = data.jobs.jobs[1].city
+  const cityi0 = data.jobs.jobs[0].city
+
+
+
+
   return (
-    <div style={{height: '568px'}}className="min-w-[600px] mt-4">
+    <div style={{ height: '568px' }} className="min-w-[600px] mt-4">
+
       <LegacyCard>
+
         <ResourceList
-          resourceName={{singular: 'customer', plural: 'customers'}}
           filterControl={
             <AlphaFilters
               queryValue={queryValue}
@@ -38,37 +89,78 @@ export function AlphaFiltersJobList() {
               onClearAll={handleFiltersClearAll}
             />
           }
+
           flushFilters
           items={[
             {
-              id: '341',
-              url: '#',
-              name: 'Mae Jemison',
-              location: 'Decatur, USA',
+              id: idi1,
+              name: namei1,
+              city: cityi1,
+            }, {
+              id: idi0,
+              name: namei0,
+              city: cityi0,
             },
-         
+
           ]}
 
           renderItem={(item) => {
-            const {id, url, name, location} = item;
+            const { id, name, city } = item;
             const media = <Avatar customer size="medium" name={name} />;
-
             return (
+
               <ResourceList.Item
                 id={id}
-                url={url}
                 media={media}
-                accessibilityLabel={`View details for ${name}`}
               >
                 <Text as="h3" fontWeight="bold">
                   {name}
                 </Text>
-                <div>{location}</div>
+                <div>{city}</div>
+                <div style={{ justifyContent: "space-between",
+                display:"flex"
+               }}
+                >
+                  <div>
+                    <Button
+                      onClick={
+                        () => {
+                         const DELETGQL =  deleteJob({ variable: { id:id } })
+                         console.log("delete",id);
+                         console.log("DELETEGQL",DELETGQL);
+                        }
+                      }
+                    >Delete</Button>
+                  </div>
+
+                  <div>
+                    <Button>Edit</Button>
+                  </div>
+                </div>
+
               </ResourceList.Item>
+
             );
           }}
         />
       </LegacyCard>
+
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <Pagination
+          label={pageValue}
+          hasNext={pageValue < totalPage}
+          onNext={onNextHandler}
+          hasPrevious={pageValue > 1}
+          onPrevious={onPreviousHandler}
+        />
+
+      </div>
     </div>
   );
 

@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 
 //react-router-dom
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+
 //Components
 import Home from './Home/Home';
 import Jobs from './Jobs/Jobs';
-
 
 //Polaris
 import {
@@ -21,7 +21,6 @@ import {
   JobsMajor
 } from '@shopify/polaris-icons';
 
-
 export default function Main() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -29,16 +28,13 @@ export default function Main() {
   const token = localStorage.getItem("token")
 
   useEffect(() => {
-
     if (!token) { navigate("/login") }
-    console.log("mounted");
-    console.log(token);
   }, [])
-
+  
   const userEmail = localStorage.getItem("user");
-  const userSplit = userEmail.split("@");
-  const userName = userSplit[0];
-  const userInitials = userEmail.slice(0, 1).toUpperCase();
+    const userSplit = userEmail ? userEmail.split("@") : null;
+    const userName = userEmail ? userSplit[0] : null;
+    const userInitials = userEmail ? userEmail.slice(0, 1).toUpperCase() : null;
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const toggleIsUserMenuOpen = useCallback(
