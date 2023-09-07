@@ -29,6 +29,7 @@ export default function Main() {
 
   useEffect(() => {
     if (!token) { navigate("/login") }
+    console.log(token);
   }, [])
   
   const userEmail = localStorage.getItem("user");

@@ -5,17 +5,20 @@ import {
   Avatar,
   Text,
   Button,
-  Pagination
+  Pagination,
 } from '@shopify/polaris';
 import { useState, useCallback } from 'react';
 //GQL
 import { JOBS_LIST } from "../../../../gql/Query";
 import { DELETE_JOB } from '../../../../gql/Mutations';
 import { useMutation, useQuery } from '@apollo/client';
+import EmptyStateComponent from './EmptyState';
+import { useNavigate } from 'react-router-dom';
 
 
 
 export function AlphaFiltersJobList() {
+  const navigate =useNavigate()
   const [queryValue, setQueryValue] = useState(undefined);
   const [deleteJob] = useMutation(DELETE_JOB)
   const [sortValue, setSortValue] = useState("DESC");
@@ -37,15 +40,6 @@ export function AlphaFiltersJobList() {
     setPageValue((prev) => prev - 1)
   }
 
-  // console.log("DATA IS:", data);
-
-
-
-  const deleteHandler = useCallback(async () => {
-    const DELETGQL = await deleteJob({ variable: { id: null } })
-  }, [deleteJob])
-
-
   const handleFiltersQueryChange = useCallback(
     (value) => setQueryValue(value),
     [],
@@ -61,15 +55,21 @@ export function AlphaFiltersJobList() {
   ]);
   const filters = [];
   const totalPage = data ? data.jobs.totalPage : 0;
-  if (loading) { return (<h2>loading ...</h2>) }
-
-  const namei1 = data.jobs.jobs[1].title
-  const namei0 = data.jobs.jobs[0].title
-  const idi1 = data.jobs.jobs[1].id
-  const idi0 = data.jobs.jobs[0].id
-  const cityi1 = data.jobs.jobs[1].city
-  const cityi0 = data.jobs.jobs[0].city
-
+  if (loading) { return (<h1>loading ...</h1>) }
+  
+  if (!data.jobs.jobs) {
+    return (<EmptyStateComponent />)
+  } 
+  
+  if (!data.jobs.jobs[1]) {
+   return (<EmptyStateComponent />)
+ }
+  const namei0 = data.jobs.jobs[0].title ? data.jobs.jobs[0].title :null
+  const namei1 = data.jobs.jobs[1].title?data.jobs.jobs[1].title :null
+  const idi0 = data.jobs.jobs[0].id?data.jobs.jobs[0].id :null
+  const idi1 = data.jobs.jobs[1].id? data.jobs.jobs[1].id:null
+  const cityi0 = data.jobs.jobs[0].city?data.jobs.jobs[0].city :null
+  const cityi1 = data.jobs.jobs[1].city?data.jobs.jobs[1].city :null
 
 
 
@@ -93,14 +93,15 @@ export function AlphaFiltersJobList() {
           flushFilters
           items={[
             {
-              id: idi1,
-              name: namei1,
-              city: cityi1,
-            }, {
               id: idi0,
               name: namei0,
               city: cityi0,
             },
+            {
+              id: idi1,
+              name: namei1,
+              city: cityi1,
+            }
 
           ]}
 
@@ -124,17 +125,19 @@ export function AlphaFiltersJobList() {
                   <div>
                     <Button
                       onClick={
-                        () => {
-                         const DELETGQL =  deleteJob({ variable: { id:id } })
-                         console.log("delete",id);
-                         console.log("DELETEGQL",DELETGQL);
+                       async () => {
+                        await deleteJob({ variables: { id:id } })
+
+                         window.location.reload()
                         }
                       }
                     >Delete</Button>
                   </div>
 
                   <div>
-                    <Button>Edit</Button>
+                    <Button
+                    onClick={()=>
+                      navigate(`/jobs/createjob/:${id}`)}>Edit</Button>
                   </div>
                 </div>
 

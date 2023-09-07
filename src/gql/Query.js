@@ -36,3 +36,20 @@ query Jobs($page: Int!, $pageSize: Int!, $sort: String!) {
     }
   }
 `;
+export const EDIT_JOB=gql`
+query Editjob($id:Int) {
+  job (id:$id) {
+    job{
+      id
+      title
+      description
+      city
+      skills{
+        id
+        title
+      }
+    }
+    message
+    status
+  }
+}`

@@ -52,3 +52,22 @@ export const DELETE_JOB = gql`
     }
   }
 `;
+
+export const UPDATE_JOB=gql`
+mutation Editjob(
+  $id:Int!
+  $title:String!
+  $description:String!
+  $city:String!
+  $skills:[String]!) {
+  updateJob (
+    id:$id
+    title:$title
+    description:$description
+    city:$city
+    skills:$skills
+  ){
+    message
+    status
+  }
+  }`;
