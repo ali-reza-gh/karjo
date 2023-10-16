@@ -16,7 +16,6 @@ import EmptyStateComponent from './EmptyState';
 import { useNavigate } from 'react-router-dom';
 
 
-
 export function AlphaFiltersJobList() {
   const navigate =useNavigate()
   const [queryValue, setQueryValue] = useState(undefined);

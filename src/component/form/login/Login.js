@@ -33,7 +33,7 @@ const Login = () => {
   useEffect(() => {
     setFocus("email")
   }, [setFocus])
-
+   
   const [login] = useMutation(LOGIN_MUTATION)
 
   const submitHandler = useCallback(
@@ -51,8 +51,9 @@ const Login = () => {
           navigate("/main");
           console.log("login")
         }
-          // : (
-            // toast(datagql.data.login.message));
+          // else {
+            // toast(datagql.data.login.message));}
+            
         // status ? (
         //   localStorage.setItem("token", datagql.data.login.token),
         //   localStorage.setItem("user", datagql.data.login.user.email),
@@ -61,8 +62,6 @@ const Login = () => {
         // )
         //   : (
         //     toast(datagql.data.login.message));
-
-
       }
 
       catch (error) {
